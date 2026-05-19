@@ -1,4 +1,4 @@
-package com.shuhang.common;
+package com.shuhang.exception.enums;
 
 import lombok.Getter;
 

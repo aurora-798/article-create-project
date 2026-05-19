@@ -1,5 +1,6 @@
 package com.shuhang.common;
 
+import com.shuhang.exception.enums.ErrorCode;
 import lombok.Data;
 
 import java.io.Serializable;

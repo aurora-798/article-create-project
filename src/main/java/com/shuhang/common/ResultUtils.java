@@ -1,6 +1,8 @@
 package com.shuhang.common;
 
 
+import com.shuhang.exception.enums.ErrorCode;
+
 /**
  * 通用返回工具类
  */
