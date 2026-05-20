@@ -40,15 +40,15 @@ public class PaymentRecord implements Serializable {
     /**
      * Stripe Checkout Session ID
      */
-    private String SessionId;
+    private String stripeSessionId;
 
     /**
      * Stripe 支付意向ID
      */
-    private String PaymentIntentId;
+    private String stripePaymentIntentId;
 
     /**
-     * 金额（人民币）
+     * 金额（美元）
      */
     private BigDecimal amount;
 

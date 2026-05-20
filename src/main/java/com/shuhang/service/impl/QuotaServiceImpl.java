@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.shuhang.constant.UserConstant.ADMIN_ROLE;
+import static com.shuhang.constant.UserConstant.VIP_ROLE;
 
 
 /**
@@ -35,24 +36,28 @@ public class QuotaServiceImpl implements QuotaService {
 
     @Override
     public boolean hasQuota(User user) {
-        // 管理员无限配额
-        if (isAdmin(user)) {
+        // 管理员和 VIP 用户无限配额
+        if (isAdmin(user) || isVip(user)) {
             return true;
         }
         // 从数据库查询最新配额，避免使用缓存的旧数据
-        User freshUser = userService.getById(user.getId());
-        if (freshUser == null) {
-            return false;
-        }
-        Integer quota = freshUser.getQuota();
-        return quota != null && quota > 0;
+        User latestUser = userMapper.selectOneById(user.getId());
+        return latestUser != null && latestUser.getQuota() != null && latestUser.getQuota() > 0;
+    }
+
+
+    /**
+     * 判断是否为 VIP
+     */
+    private boolean isVip(User user) {
+        return VIP_ROLE.equals(user.getUserRole());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void consumeQuota(User user) {
-        // 管理员不消耗配额
-        if (isAdmin(user)) {
+        // 管理员和 VIP 用户不消耗配额
+        if (isAdmin(user) || isVip(user)) {
             return;
         }
 
@@ -70,8 +75,8 @@ public class QuotaServiceImpl implements QuotaService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void checkAndConsumeQuota(User user) {
-        // 管理员跳过检查
-        if (isAdmin(user)) {
+        // 管理员跳过检查或者用户已经充值 VIP
+        if (isAdmin(user) || isVip(user)) {
             return;
         }
 
