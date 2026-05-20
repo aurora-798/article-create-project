@@ -2,7 +2,7 @@ package com.shuhang.manager;
 
 import com.shuhang.model.dto.image.ImageData;
 import com.shuhang.model.dto.image.ImageRequest;
-import com.shuhang.enums.ImageMethodEnum;
+import com.shuhang.model.enums.ImageMethodEnum;
 import com.shuhang.service.CosService;
 import com.shuhang.service.ImageSearchService;
 import jakarta.annotation.PostConstruct;

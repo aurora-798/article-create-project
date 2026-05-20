@@ -2,7 +2,7 @@ package com.shuhang.service;
 
 import cn.hutool.core.util.StrUtil;
 import com.shuhang.config.EmojiPackConfig;
-import com.shuhang.enums.ImageMethodEnum;
+import com.shuhang.model.enums.ImageMethodEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;

@@ -10,7 +10,7 @@ import com.shuhang.model.User;
 import com.shuhang.model.dto.user.UserQueryRequest;
 import com.shuhang.model.vo.user.LoginUserVO;
 import com.shuhang.model.vo.user.UserVO;
-import com.shuhang.enums.UserRoleEnum;
+import com.shuhang.model.enums.UserRoleEnum;
 import com.shuhang.exception.BusinessException;
 import com.shuhang.exception.enums.ErrorCode;
 import com.shuhang.mapper.UserMapper;

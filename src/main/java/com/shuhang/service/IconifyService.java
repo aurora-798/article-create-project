@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.shuhang.config.IconifyConfig;
-import com.shuhang.enums.ImageMethodEnum;
+import com.shuhang.model.enums.ImageMethodEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;

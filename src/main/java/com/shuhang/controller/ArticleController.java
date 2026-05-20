@@ -7,11 +7,13 @@ import com.shuhang.common.DeleteRequest;
 import com.shuhang.common.ResultUtils;
 import com.shuhang.model.User;
 import com.shuhang.model.dto.article.*;
+import com.shuhang.model.vo.AgentExecutionStats;
 import com.shuhang.model.vo.article.ArticleVO;
-import com.shuhang.enums.ArticleStyleEnum;
+import com.shuhang.model.enums.ArticleStyleEnum;
 import com.shuhang.exception.ThrowUtils;
 import com.shuhang.exception.enums.ErrorCode;
 import com.shuhang.manager.SseEmitterManager;
+import com.shuhang.service.AgentLogService;
 import com.shuhang.service.ArticleAsyncService;
 import com.shuhang.service.ArticleService;
 import com.shuhang.service.UserService;
@@ -42,6 +44,23 @@ public class ArticleController {
 
     @Resource
     private UserService userService;
+
+
+    @Resource
+    private AgentLogService agentLogService;
+
+    /**
+     * 获取任务执行日志
+     */
+    @GetMapping("/execution-logs/{taskId}")
+    @Operation(summary = "获取任务执行日志")
+    public BaseResponse<AgentExecutionStats> getExecutionLogs(@PathVariable String taskId) {
+        ThrowUtils.throwIf(taskId == null || taskId.trim().isEmpty(),
+                ErrorCode.PARAMS_ERROR, "任务ID不能为空");
+
+        AgentExecutionStats stats = agentLogService.getExecutionStats(taskId);
+        return ResultUtils.success(stats);
+    }
 
     /**
      * 创建文章任务

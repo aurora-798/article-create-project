@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.shuhang.config.PexelsConfig;
-import com.shuhang.enums.ImageMethodEnum;
+import com.shuhang.model.enums.ImageMethodEnum;
 import com.shuhang.service.ImageSearchService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

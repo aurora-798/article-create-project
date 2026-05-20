@@ -1,4 +1,4 @@
-package com.shuhang.enums;
+package com.shuhang.model.enums;
 
 
 import lombok.Getter;

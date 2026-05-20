@@ -7,8 +7,8 @@ import com.shuhang.model.User;
 import com.shuhang.model.dto.article.ArticleQueryRequest;
 import com.shuhang.model.dto.article.ArticleState;
 import com.shuhang.model.vo.article.ArticleVO;
-import com.shuhang.enums.ArticlePhaseEnum;
-import com.shuhang.enums.ArticleStatusEnum;
+import com.shuhang.model.enums.ArticlePhaseEnum;
+import com.shuhang.model.enums.ArticleStatusEnum;
 
 import java.util.List;
 

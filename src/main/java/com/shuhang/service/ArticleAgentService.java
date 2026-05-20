@@ -48,4 +48,37 @@ public interface ArticleAgentService extends IService<Article> {
      * @param streamHandler 流式输出处理器
      */
     public void executePhase3_GenerateContent(ArticleState state, Consumer<String> streamHandler);
+
+
+
+    /**
+     * 智能体1：生成标题方案（3-5个）
+     */
+    public void agent1GenerateTitleOptions(ArticleState state);
+
+    /**
+     * 智能体2：生成大纲（流式输出）
+     */
+    public void agent2GenerateOutline(ArticleState state, Consumer<String> streamHandler);
+
+    /**
+     * 智能体3：生成正文（流式输出）
+     */
+    public void agent3GenerateContent(ArticleState state, Consumer<String> streamHandler);
+
+    /**
+     * 智能体4：分析配图需求（在正文中插入占位符）
+     */
+    public void agent4AnalyzeImageRequirements(ArticleState state);
+
+    /**
+     * 智能体5：生成配图（串行执行，支持混用多种配图方式，统一上传到 COS）
+     */
+    public void agent5GenerateImages(ArticleState state, Consumer<String> streamHandler);
+
+
+    /**
+     * 图文合成：根据占位符将配图插入正文
+     */
+    public void mergeImagesIntoContent(ArticleState state);
 }

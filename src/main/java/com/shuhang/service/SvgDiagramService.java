@@ -6,7 +6,7 @@ import com.shuhang.model.dto.image.ImageData;
 import com.shuhang.model.dto.image.ImageRequest;
 import com.shuhang.config.SvgDiagramConfig;
 import com.shuhang.constant.PromptConstant;
-import com.shuhang.enums.ImageMethodEnum;
+import com.shuhang.model.enums.ImageMethodEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.UserMessage;
