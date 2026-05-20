@@ -15,6 +15,7 @@ import com.shuhang.constant.UserConstant;
 import com.shuhang.exception.BusinessException;
 import com.shuhang.exception.ThrowUtils;
 import com.shuhang.exception.enums.ErrorCode;
+import com.shuhang.service.CosService;
 import com.shuhang.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,9 +23,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 用户控制层
@@ -36,6 +41,18 @@ public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private CosService cosService;
+
+    private static final long AVATAR_MAX_SIZE = 2 * 1024 * 1024;
+
+    private static final Set<String> AVATAR_CONTENT_TYPES = Set.of(
+            "image/jpeg",
+            "image/png",
+            "image/gif",
+            "image/webp"
+    );
 
     /**
      * 用户注册
@@ -155,6 +172,45 @@ public class UserController {
         boolean result = userService.updateById(user);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
+    }
+
+    /**
+     * 当前登录用户更新个人资料
+     */
+    @PostMapping("/update/my")
+    public BaseResponse<Boolean> updateMyUser(@RequestBody UserUpdateMyRequest userUpdateMyRequest,
+                                              HttpServletRequest request) {
+        ThrowUtils.throwIf(userUpdateMyRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        User user = new User();
+        BeanUtil.copyProperties(userUpdateMyRequest, user);
+        user.setId(loginUser.getId());
+        boolean result = userService.updateById(user);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, userService.getById(loginUser.getId()));
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 上传头像图片到对象存储，返回可访问 URL
+     */
+    @PostMapping("/upload/avatar")
+    public BaseResponse<String> uploadAvatar(@RequestParam("file") MultipartFile file,
+                                             HttpServletRequest request) throws IOException {
+        userService.getLoginUser(request);
+        if (file == null || file.isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "文件为空");
+        }
+        if (file.getSize() > AVATAR_MAX_SIZE) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "头像不能超过 2MB");
+        }
+        String contentType = file.getContentType();
+        if (contentType == null || !AVATAR_CONTENT_TYPES.contains(contentType.toLowerCase())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "仅支持 jpg、png、gif、webp 图片");
+        }
+        String url = cosService.uploadBytes(file.getBytes(), contentType, "avatar");
+        ThrowUtils.throwIf(url == null || url.isEmpty(), ErrorCode.OPERATION_ERROR, "头像上传失败");
+        return ResultUtils.success(url);
     }
 
     /**
