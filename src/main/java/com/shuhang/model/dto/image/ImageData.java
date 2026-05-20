@@ -1,4 +1,4 @@
-package com.shuhang.common.model.dto.image;
+package com.shuhang.model.dto.image;
 
 import java.util.Base64;
 import lombok.Builder;

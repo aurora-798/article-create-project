@@ -1,4 +1,4 @@
-package com.shuhang.common.model.dto.user;
+package com.shuhang.model.dto.user;
 
 import com.shuhang.common.PageRequest;
 import lombok.Data;

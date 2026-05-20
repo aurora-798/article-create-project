@@ -1,7 +1,7 @@
 package com.shuhang.service;
 
 
-import com.shuhang.common.model.User;
+import com.shuhang.model.User;
 
 /**
  * 配额服务接口

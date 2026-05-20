@@ -2,8 +2,8 @@ package com.shuhang.service;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
-import com.shuhang.common.model.dto.image.ImageData;
-import com.shuhang.common.model.dto.image.ImageRequest;
+import com.shuhang.model.dto.image.ImageData;
+import com.shuhang.model.dto.image.ImageRequest;
 import com.shuhang.config.SvgDiagramConfig;
 import com.shuhang.constant.PromptConstant;
 import com.shuhang.enums.ImageMethodEnum;

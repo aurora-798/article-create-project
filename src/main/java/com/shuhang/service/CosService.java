@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
-import com.shuhang.common.model.dto.image.ImageData;
+import com.shuhang.model.dto.image.ImageData;
 import com.shuhang.config.CosServiceConfig;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

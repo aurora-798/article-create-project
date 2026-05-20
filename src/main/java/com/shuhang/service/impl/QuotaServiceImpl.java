@@ -1,6 +1,6 @@
 package com.shuhang.service.impl;
 
-import com.shuhang.common.model.User;
+import com.shuhang.model.User;
 import com.shuhang.exception.BusinessException;
 import com.shuhang.exception.enums.ErrorCode;
 import com.shuhang.mapper.UserMapper;

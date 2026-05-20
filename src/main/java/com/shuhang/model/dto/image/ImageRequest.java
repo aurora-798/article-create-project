@@ -1,4 +1,4 @@
-package com.shuhang.common.model.dto.image;
+package com.shuhang.model.dto.image;
 
 import lombok.Builder;
 import lombok.Data;

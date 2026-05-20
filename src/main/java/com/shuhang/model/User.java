@@ -1,4 +1,4 @@
-package com.shuhang.common.model;
+package com.shuhang.model;
 
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
@@ -40,7 +40,18 @@ public class User implements Serializable {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
+
+    /**
+     * 拥有配额
+     */
     private Integer quota;
+
+
+    /**
+     * 成为会员时间
+     */
+    private LocalDateTime vipTime;
+
 
     /**
      * 逻辑删除

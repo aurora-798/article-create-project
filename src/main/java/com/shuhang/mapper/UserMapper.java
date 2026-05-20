@@ -1,7 +1,7 @@
 package com.shuhang.mapper;
 
 import com.mybatisflex.core.BaseMapper;
-import com.shuhang.common.model.User;
+import com.shuhang.model.User;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 

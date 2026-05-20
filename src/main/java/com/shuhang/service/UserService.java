@@ -3,10 +3,10 @@ package com.shuhang.service;
 import com.mybatisflex.core.query.QueryWrapper;
 
 import com.mybatisflex.core.service.IService;
-import com.shuhang.common.model.User;
-import com.shuhang.common.model.dto.user.UserQueryRequest;
-import com.shuhang.common.model.vo.user.LoginUserVO;
-import com.shuhang.common.model.vo.user.UserVO;
+import com.shuhang.model.User;
+import com.shuhang.model.dto.user.UserQueryRequest;
+import com.shuhang.model.vo.user.LoginUserVO;
+import com.shuhang.model.vo.user.UserVO;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;

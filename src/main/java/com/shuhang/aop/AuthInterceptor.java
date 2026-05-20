@@ -1,7 +1,7 @@
 package com.shuhang.aop;
 
 import com.shuhang.annotation.AuthCheck;
-import com.shuhang.common.model.User;
+import com.shuhang.model.User;
 import com.shuhang.enums.UserRoleEnum;
 import com.shuhang.exception.BusinessException;
 import com.shuhang.exception.enums.ErrorCode;

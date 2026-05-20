@@ -1,8 +1,8 @@
 package com.shuhang.service;
 
 
-import com.shuhang.common.model.dto.image.ImageData;
-import com.shuhang.common.model.dto.image.ImageRequest;
+import com.shuhang.model.dto.image.ImageData;
+import com.shuhang.model.dto.image.ImageRequest;
 import com.shuhang.enums.ImageMethodEnum;
 
 /**
