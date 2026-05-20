@@ -29,7 +29,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/article")
-@Tag(name = "文章接口")
+@Tag(name = "ArticleController",description = "文章接口")
 @Slf4j
 public class ArticleController {
 
