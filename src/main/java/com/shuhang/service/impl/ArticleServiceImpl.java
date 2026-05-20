@@ -15,9 +15,12 @@ import com.shuhang.exception.ThrowUtils;
 import com.shuhang.exception.enums.ErrorCode;
 import com.shuhang.mapper.ArticleMapper;
 import com.shuhang.service.ArticleService;
+import com.shuhang.service.QuotaService;
 import com.shuhang.utils.GsonUtils;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,8 +33,11 @@ import static com.shuhang.constant.UserConstant.ADMIN_ROLE;
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
 
 
+    @Resource
+    private QuotaService quotaService;
+
     @Override
-    public String createArticleTask(String topic, User loginUser) {
+    public String createArticleTask(String topic, String style, User loginUser) {
         // 生成任务ID
         String taskId = IdUtil.simpleUUID();
 
@@ -40,12 +46,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         article.setTaskId(taskId);
         article.setUserId(loginUser.getId());
         article.setTopic(topic);
+        article.setStyle(style);
         article.setStatus(ArticleStatusEnum.PENDING.getValue());
         article.setCreateTime(LocalDateTime.now());
 
         this.save(article);
 
-        log.info("文章任务已创建, taskId={}, userId={}", taskId, loginUser.getId());
+        log.info("文章任务已创建, taskId={}, userId={}, style={}", taskId, loginUser.getId(), style);
         return taskId;
     }
 
@@ -159,7 +166,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return ArticleVO.objToVo(article);
     }
 
-
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String createArticleTaskWithQuotaCheck(String topic, String style, User loginUser) {
+        // 在同一事务中：先扣配额，再创建任务
+        // 如果任务创建失败，配额会自动回滚
+        quotaService.checkAndConsumeQuota(loginUser);
+        return createArticleTask(topic, style, loginUser);
+    }
 
     /**
      * 校验文章权限

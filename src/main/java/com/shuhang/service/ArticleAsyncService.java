@@ -26,52 +26,56 @@ public class ArticleAsyncService {
     @Resource
     private ArticleService articleService;
 
+
     /**
      * 异步执行文章生成
      *
-     * @param taskId 任务ID
-     * @param topic  选题
+     * @param taskId              任务ID
+     * @param topic               选题
+     * @param style               文章风格（可为空）
+     * @param enabledImageMethods 允许的配图方式列表（为空表示支持所有方式）
      */
     @Async("articleExecutor")
-    public void executeArticleGeneration(String taskId, String topic) {
-        log.info("异步任务开始, taskId={}, topic={}", taskId, topic);
-        
+    public void executeArticleGeneration(String taskId, String topic, String style, java.util.List<String> enabledImageMethods) {
+        log.info("异步任务开始, taskId={}, topic={}, style={}, enabledImageMethods={}", taskId, topic, style, enabledImageMethods);
         try {
             // 更新状态为处理中
             articleService.updateArticleStatus(taskId, ArticleStatusEnum.PROCESSING, null);
-            
+
             // 创建状态对象
             ArticleState state = new ArticleState();
             state.setTaskId(taskId);
             state.setTopic(topic);
-            
+            state.setStyle(style);
+            state.setEnabledImageMethods(enabledImageMethods);
+
             // 执行智能体编排,并通过 SSE 推送进度
             articleAgentService.executeArticleGeneration(state, message -> {
                 handleAgentMessage(taskId, message, state);
             });
-            
+
             // 保存完整文章到数据库
             articleService.saveArticleContent(taskId, state);
-            
+
             // 更新状态为已完成
             articleService.updateArticleStatus(taskId, ArticleStatusEnum.COMPLETED, null);
-            
+
             // 推送完成消息
             sendSseMessage(taskId, SseMessageTypeEnum.ALL_COMPLETE, Map.of("taskId", taskId));
-            
+
             // 完成 SSE 连接
             sseEmitterManager.complete(taskId);
-            
+
             log.info("异步任务完成, taskId={}", taskId);
         } catch (Exception e) {
             log.error("异步任务失败, taskId={}", taskId, e);
-            
+
             // 更新状态为失败
             articleService.updateArticleStatus(taskId, ArticleStatusEnum.FAILED, e.getMessage());
-            
+
             // 推送错误消息
             sendSseMessage(taskId, SseMessageTypeEnum.ERROR, Map.of("message", e.getMessage()));
-            
+
             // 完成 SSE 连接
             sseEmitterManager.complete(taskId);
         }

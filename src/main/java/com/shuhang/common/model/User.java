@@ -40,6 +40,8 @@ public class User implements Serializable {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
+    private Integer quota;
+
     /**
      * 逻辑删除
      */

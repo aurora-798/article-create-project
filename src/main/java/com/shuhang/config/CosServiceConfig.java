@@ -22,6 +22,7 @@ public class CosServiceConfig {
     private String secretKey;
     private String endpoint;
     private String bucketName;
+    private String region = "";
 
 
     @Bean
