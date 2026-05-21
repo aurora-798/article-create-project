@@ -3,6 +3,8 @@ package com.shuhang.agent;
 import com.alibaba.cloud.ai.graph.*;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shuhang.agent.agents.*;
 import com.shuhang.agent.config.AgentConfig;
 import com.shuhang.agent.context.StreamHandlerContext;
@@ -133,13 +135,17 @@ public class ArticleAgentOrchestrator {
             
             if (result.isPresent()) {
                 OverAllState finalState = result.get();
+                ObjectMapper objectMapper = new ObjectMapper();
                 
                 ArticleState.OutlineResult outline = finalState.value(KEY_OUTLINE)
                         .map(v -> {
-                            if (v instanceof ArticleState.OutlineResult) {
-                                return (ArticleState.OutlineResult) v;
+                            try {
+                                return objectMapper.convertValue(v,ArticleState.OutlineResult.class);
                             }
-                            return null;
+                            catch (Exception e) {
+                                log.error("outline 转换失败",e);
+                                return null;
+                            }
                         })
                         .orElse(null);
                 
@@ -202,10 +208,13 @@ public class ArticleAgentOrchestrator {
                 List<ArticleState.ImageRequirement> imageRequirements = finalState.value(KEY_IMAGE_REQUIREMENTS)
                         .map(v -> (List<ArticleState.ImageRequirement>) v)
                         .orElse(null);
-                
-                @SuppressWarnings("unchecked")
+
+                ObjectMapper objectMapper = new ObjectMapper();
                 List<ArticleState.ImageResult> images = finalState.value(KEY_IMAGES)
-                        .map(v -> (List<ArticleState.ImageResult>) v)
+                        .map(v -> objectMapper.convertValue(
+                                v,
+                                new TypeReference<List<ArticleState.ImageResult>>() {}
+                        ))
                         .orElse(null);
                 
                 String fullContent = finalState.value(KEY_FULL_CONTENT)
