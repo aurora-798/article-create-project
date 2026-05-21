@@ -1,6 +1,8 @@
 package com.shuhang.service;
 
 import com.google.gson.reflect.TypeToken;
+import com.shuhang.agent.ArticleAgentOrchestrator;
+import com.shuhang.agent.config.AgentConfig;
 import com.shuhang.model.Article;
 import com.shuhang.model.dto.article.ArticleState;
 import com.shuhang.model.enums.ArticlePhaseEnum;
@@ -29,6 +31,13 @@ public class ArticleAsyncService {
 
     @Resource
     private ArticleService articleService;
+
+    @Resource
+    private ArticleAgentOrchestrator articleAgentOrchestrator;
+
+    @Resource
+    private AgentConfig agentConfig;
+
 
     /**
      * 处理智能体消息并推送
@@ -139,6 +148,7 @@ public class ArticleAsyncService {
      */
     @Async("articleExecutor")
     public void executePhase1(String taskId, String topic, String style) {
+        boolean orchestratorEnabled = agentConfig.isOrchestratorEnabled();
         log.info("阶段1异步任务开始, taskId={}, topic={}, style={}", taskId, topic, style);
 
         try {
@@ -153,9 +163,16 @@ public class ArticleAsyncService {
             state.setStyle(style);
 
             // 执行阶段1：生成标题方案
-            articleAgentService.executePhase1_GenerateTitles(state, message -> {
-                handleAgentMessage(taskId, message, state);
-            });
+            if(orchestratorEnabled) {   // 智能体编排逻辑
+                articleAgentOrchestrator.executePhase1_GenerateTitles(state,message -> {
+                    handleAgentMessage(taskId,message,state);
+                });
+            }
+            else {  // 原有服务逻辑
+                articleAgentService.executePhase1_GenerateTitles(state, message -> {
+                    handleAgentMessage(taskId, message, state);
+                });
+            }
 
             // 保存标题方案到数据库
             articleService.saveTitleOptions(taskId, state.getTitleOptions());
@@ -192,6 +209,7 @@ public class ArticleAsyncService {
      */
     @Async("articleExecutor")
     public void executePhase2(String taskId) {
+        boolean orchestratorEnabled = agentConfig.isOrchestratorEnabled();
         log.info("阶段2异步任务开始, taskId={}", taskId);
 
         try {
@@ -214,9 +232,16 @@ public class ArticleAsyncService {
             state.setTitle(title);
 
             // 执行阶段2：生成大纲
-            articleAgentService.executePhase2_GenerateOutline(state, message -> {
-                handleAgentMessage(taskId, message, state);
-            });
+            if(orchestratorEnabled) {   // 智能体编排逻辑
+                articleAgentOrchestrator.executePhase2_GenerateOutline(state, message -> {
+                    handleAgentMessage(taskId, message, state);
+                });
+            }
+            else {  // 原有服务逻辑
+                articleAgentService.executePhase2_GenerateOutline(state, message -> {
+                    handleAgentMessage(taskId, message, state);
+                });
+            }
 
             // 保存大纲到数据库
             Article articleToUpdate = articleService.getByTaskId(taskId);
@@ -254,6 +279,7 @@ public class ArticleAsyncService {
      */
     @Async("articleExecutor")
     public void executePhase3(String taskId) {
+        boolean orchestratorEnabled = agentConfig.isOrchestratorEnabled();
         log.info("阶段3异步任务开始, taskId={}", taskId);
 
         try {
@@ -294,9 +320,16 @@ public class ArticleAsyncService {
             state.setOutline(outlineResult);
 
             // 执行阶段3：生成正文+配图
-            articleAgentService.executePhase3_GenerateContent(state, message -> {
-                handleAgentMessage(taskId, message, state);
-            });
+            if(orchestratorEnabled) {   // 智能体编排逻辑
+                articleAgentService.executePhase3_GenerateContent(state, message -> {
+                    handleAgentMessage(taskId, message, state);
+                });
+            }
+            else {  // 原有服务逻辑
+                articleAgentService.executePhase3_GenerateContent(state, message -> {
+                    handleAgentMessage(taskId, message, state);
+                });
+            }
 
             // 保存完整文章到数据库
             articleService.saveArticleContent(taskId, state);

@@ -9,6 +9,7 @@ spring:
     # session 30 ???
     timeout: 2592000
   # Redis ??
+
   data:
     redis:
       host: localhost
@@ -39,3 +40,14 @@ knife4j:
 mybatis-flex:
   configuration:
     map-underscore-to-camel-case: false
+
+# 文章智能体配置
+article:
+  agent:
+    orchestrator:
+      # 是否启用多智能体编排模式（支持配图并行生成）
+      # true: 使用 Spring AI Alibaba 多智能体编排
+      # false: 使用原有的 ArticleAgentService
+      enabled: true
+    # Agent 最大迭代次数
+    max-iterations: 10
