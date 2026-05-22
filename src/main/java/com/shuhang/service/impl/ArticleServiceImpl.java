@@ -266,6 +266,44 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return createArticleTask(topic, style, enabledImageMethods, loginUser);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String recreateArticleTaskWithQuotaCheck(String sourceTaskId, User loginUser) {
+        ThrowUtils.throwIf(sourceTaskId == null || sourceTaskId.trim().isEmpty(),
+                ErrorCode.PARAMS_ERROR, "来源任务ID不能为空");
+
+        Article sourceArticle = getByTaskId(sourceTaskId);
+        ThrowUtils.throwIf(sourceArticle == null, ErrorCode.NOT_FOUND_ERROR, "来源文章不存在");
+        checkArticlePermission(sourceArticle, loginUser);
+        ThrowUtils.throwIf(sourceArticle.getMainTitle() == null || sourceArticle.getMainTitle().trim().isEmpty(),
+                ErrorCode.OPERATION_ERROR, "来源文章缺少已确认标题，无法重新创建");
+        ThrowUtils.throwIf(sourceArticle.getSubTitle() == null || sourceArticle.getSubTitle().trim().isEmpty(),
+                ErrorCode.OPERATION_ERROR, "来源文章缺少已确认副标题，无法重新创建");
+
+        quotaService.checkAndConsumeQuota(loginUser);
+
+        String taskId = IdUtil.simpleUUID();
+        Article article = new Article();
+        article.setTaskId(taskId);
+        article.setUserId(loginUser.getId());
+        article.setTopic(sourceArticle.getTopic());
+        article.setStyle(sourceArticle.getStyle());
+        article.setEnabledImageMethods(sourceArticle.getEnabledImageMethods());
+        article.setMainTitle(sourceArticle.getMainTitle());
+        article.setSubTitle(sourceArticle.getSubTitle());
+        article.setUserDescription(sourceArticle.getUserDescription());
+        article.setTitleOptions(sourceArticle.getTitleOptions());
+        article.setStatus(ArticleStatusEnum.PROCESSING.getValue());
+        article.setPhase(ArticlePhaseEnum.OUTLINE_GENERATING.getValue());
+        article.setCreateTime(LocalDateTime.now());
+
+        this.save(article);
+        log.info("文章任务已重新创建, sourceTaskId={}, newTaskId={}, userId={}",
+                sourceTaskId, taskId, loginUser.getId());
+
+        return taskId;
+    }
+
     /**
      * 将文章分页结果转换为 VO 分页
      *

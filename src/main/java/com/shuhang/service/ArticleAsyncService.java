@@ -224,7 +224,6 @@ public class ArticleAsyncService {
             state.setTaskId(taskId);
             state.setStyle(article.getStyle());
             state.setUserDescription(article.getUserDescription());
-
             // 设置标题
             ArticleState.TitleResult title = new ArticleState.TitleResult();
             title.setMainTitle(article.getMainTitle());
@@ -259,7 +258,6 @@ public class ArticleAsyncService {
             log.info("阶段2异步任务完成, taskId={}", taskId);
         } catch (Exception e) {
             log.error("阶段2异步任务失败, taskId={}", taskId, e);
-
             articleService.updateArticleStatus(taskId, ArticleStatusEnum.FAILED, e.getMessage());
             sendSseMessage(taskId, SseMessageTypeEnum.ERROR, Map.of("message", e.getMessage()));
             sseEmitterManager.complete(taskId);

@@ -9,6 +9,7 @@ import com.shuhang.model.User;
 import com.shuhang.model.dto.article.*;
 import com.shuhang.model.vo.AgentExecutionStats;
 import com.shuhang.model.vo.article.ArticleVO;
+import com.shuhang.model.enums.ArticlePhaseEnum;
 import com.shuhang.model.enums.ArticleStyleEnum;
 import com.shuhang.exception.ThrowUtils;
 import com.shuhang.exception.enums.ErrorCode;
@@ -92,6 +93,48 @@ public class ArticleController {
                 request.getStyle()
         );
         return ResultUtils.success(taskId);
+    }
+
+    /**
+     * 基于已有文章重新创建任务
+     */
+    @PostMapping("/recreate")
+    @Operation(summary = "基于已有文章重新创建任务")
+    public BaseResponse<String> recreateArticle(@RequestBody ArticleRecreateRequest request,
+                                                HttpServletRequest httpServletRequest) {
+        ThrowUtils.throwIf(request == null, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(request.getSourceTaskId() == null || request.getSourceTaskId().trim().isEmpty(),
+                ErrorCode.PARAMS_ERROR, "来源任务ID不能为空");
+
+        User loginUser = userService.getLoginUser(httpServletRequest);
+        String taskId = articleService.recreateArticleTaskWithQuotaCheck(request.getSourceTaskId(), loginUser);
+
+        return ResultUtils.success(taskId);
+    }
+
+    /**
+     * 启动大纲生成
+     */
+    @PostMapping("/start-outline")
+    @Operation(summary = "启动大纲生成")
+    public BaseResponse<Void> startOutline(@RequestBody ArticleStartOutlineRequest request,
+                                           HttpServletRequest httpServletRequest) {
+        ThrowUtils.throwIf(request == null, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(request.getTaskId() == null || request.getTaskId().trim().isEmpty(),
+                ErrorCode.PARAMS_ERROR, "任务ID不能为空");
+
+        User loginUser = userService.getLoginUser(httpServletRequest);
+        ArticleVO articleVO = articleService.getArticleDetail(request.getTaskId(), loginUser);
+        ThrowUtils.throwIf(!ArticlePhaseEnum.OUTLINE_GENERATING.getValue().equals(articleVO.getPhase()),
+                ErrorCode.OPERATION_ERROR, "当前阶段不允许启动大纲生成");
+        ThrowUtils.throwIf(articleVO.getMainTitle() == null || articleVO.getMainTitle().trim().isEmpty(),
+                ErrorCode.OPERATION_ERROR, "文章缺少已确认标题");
+        ThrowUtils.throwIf(articleVO.getSubTitle() == null || articleVO.getSubTitle().trim().isEmpty(),
+                ErrorCode.OPERATION_ERROR, "文章缺少已确认副标题");
+
+        articleAsyncService.executePhase2(request.getTaskId());
+
+        return ResultUtils.success(null);
     }
 
 

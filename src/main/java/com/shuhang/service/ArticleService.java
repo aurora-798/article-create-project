@@ -40,6 +40,16 @@ public interface ArticleService extends IService<Article> {
      */
     String createArticleTaskWithQuotaCheck(String topic, String style, List<String> enabledImageMethods, User loginUser);
 
+    /**
+     * 基于已有文章重新创建任务（带配额检查）
+     * 复用原文章的选题、风格、配图方式、标题和补充描述，并从大纲生成阶段继续。
+     *
+     * @param sourceTaskId 来源文章任务ID
+     * @param loginUser    当前登录用户
+     * @return 新任务ID
+     */
+    String recreateArticleTaskWithQuotaCheck(String sourceTaskId, User loginUser);
+
 
     /**
      * 确认标题（用户选择后）
